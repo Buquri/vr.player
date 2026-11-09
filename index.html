@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="utf-8">
+  <title>Quest 3 WebXR Ultra Player & Browser</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- A-Frame & HLS.js Libraries -->
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script src="app.js"></script>
+</head>
+<body>
+
+  <!-- 2D GUI Control Panel -->
+  <div id="2d-gui-container">
+    <h2>Quest 3 Media Station</h2>
+    
+    <div class="section-title">ლოკალური მედია</div>
+    <div class="input-group">
+      <label for="file-selector" class="btn btn-file">📁 ვიდეო ფაილის გახსნა</label>
+      <input type="file" id="file-selector" accept="video/*">
+    </div>
+
+    <div class="section-title">🌐 ვებ-ბრაუზერი VR-ში</div>
+    <div class="input-group">
+      <input type="text" id="browser-url-input" placeholder="youtube.com ან google.com">
+      <button class="btn btn-primary" onclick="loadWebPage(document.getElementById('browser-url-input').value)">ბრაუზერში შესვლა</button>
+    </div>
+
+    <div class="section-title">📺 ონლაინ ვიდეო / HLS URL</div>
+    <div class="input-group">
+      <input type="text" id="stream-url-input" placeholder="https://domain.com/video.mp4">
+      <button class="btn btn-primary" onclick="loadVideoUrl(document.getElementById('stream-url-input').value)">ვიდეოს დაკვრა</button>
+    </div>
+
+    <div class="section-title">⚡ სწრაფი ტესტირება</div>
+    <div class="preset-grid">
+      <button class="btn-sm" onclick="loadVideoUrl('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')">Demo Video 1</button>
+      <button class="btn-sm" onclick="loadVideoUrl('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')">Demo Video 2</button>
+      <button class="btn-sm" onclick="loadWebPage('https://bing.com')">Bing Search</button>
+      <button class="btn-sm" onclick="loadWebPage('https://wikipedia.org')">Wikipedia</button>
+    </div>
+  </div>
+
+  <!-- WebXR 3D Scene -->
+  <a-scene webxr="optionalFeatures: hit-test, local-floor, passthrough">
+    
+    <a-assets>
+      <video id="main-video" loop crossorigin="anonymous" playsinline
+             src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4">
+      </video>
+    </a-assets>
+
+    <!-- Dynamic Ambilight -->
+    <a-entity id="ambilight-aura" light="type: point; distance: 9; intensity: 2; color: #00f2fe" position="0 1.6 -3"></a-entity>
+
+    <!-- 1. Curved Video Screen -->
+    <a-curvedradius 
+      id="vr-screen"
+      visible="true"
+      material="src: #main-video; shader: flat;" 
+      radius="3.5" 
+      theta-length="75" 
+      height="2.1" 
+      position="0 1.6 -3" 
+      rotation="0 142.5 0">
+    </a-curvedradius>
+
+    <!-- 2. Interactive Web Browser Screen (Virtual 3D Window) -->
+    <a-entity id="web-browser-plane" visible="false" position="0 1.6 -2.8">
+      <a-plane width="3.2" height="1.8" color="#111" material="shader: flat">
+        <!-- Embedded HTML Iframe Canvas inside VR -->
+        <a-html-embed position="0 0 0.01">
+          <iframe id="browser-iframe" src="about:blank" style="width: 1280px; height: 720px; border: none;"></iframe>
+        </a-html-embed>
+      </a-plane>
+    </a-entity>
+
+    <!-- 3D VR Floating Controller Panel (HUD) -->
+    <a-entity id="vr-hud" position="0 0.3 -2.2">
+
+      <!-- Play / Pause -->
+      <a-box class="interactive" position="-1.0 0 0" scale="0.32 0.14 0.06" color="#00f2fe"
+             text="value: PLAY/PAUSE; align: center; width: 2.2; color: #000"
+             onclick="togglePlay()"></a-box>
+
+      <!-- Rewind -10s -->
+      <a-box class="interactive" position="-0.6 0 0" scale="0.22 0.14 0.06" color="#1f2937"
+             text="value: -10s; align: center; width: 2.2; color: #fff"
+             onclick="skipTime(-10)"></a-box>
+
+      <!-- Forward +10s -->
+      <a-box class="interactive" position="-0.3 0 0" scale="0.22 0.14 0.06" color="#1f2937"
+             text="value: +10s; align: center; width: 2.2; color: #fff"
+             onclick="skipTime(10)"></a-box>
+
+      <!-- Curve+ -->
+      <a-box class="interactive" position="0.05 0 0" scale="0.24 0.14 0.06" color="#374151"
+             text="value: CURVE +; align: center; width: 2.2; color: #fff"
+             onclick="adjustCurve(10)"></a-box>
+
+      <!-- Curve- -->
+      <a-box class="interactive" position="0.33 0 0" scale="0.24 0.14 0.06" color="#374151"
+             text="value: CURVE -; align: center; width: 2.2; color: #fff"
+             onclick="adjustCurve(-10)"></a-box>
+
+      <!-- Distance Closer/Further -->
+      <a-box class="interactive" position="0.65 0 0" scale="0.24 0.14 0.06" color="#4b5563"
+             text="value: DIST +/-; align: center; width: 2.0; color: #fff"
+             onclick="adjustDistance(0.5)"></a-box>
+
+      <!-- Passthrough Toggle -->
+      <a-box class="interactive" position="1.05 0 0" scale="0.32 0.14 0.06" color="#f59e0b"
+             text="value: PASSTHROUGH; align: center; width: 2.0; color: #000"
+             onclick="setEnvironment('passthrough')"></a-box>
+
+    </a-entity>
+
+    <!-- Quest 3 Rig Controls & Laser Pointer -->
+    <a-entity camera look-controls position="0 1.6 0">
+      <a-cursor color="#00f2fe" raycaster="objects: .interactive"></a-cursor>
+    </a-entity>
+
+    <!-- Hands & Controllers Raycasters -->
+    <a-entity oculus-touch-controls="hand: left" raycaster="objects: .interactive"></a-entity>
+    <a-entity oculus-touch-controls="hand: right" raycaster="objects: .interactive"></a-entity>
+
+    <!-- Environment Skybox -->
+    <a-sky id="scene-sky" color="#000" material="transparent: true; opacity: 0"></a-sky>
+
+  </a-scene>
+
+</body>
+</html>

@@ -1,0 +1,134 @@
+/* style.css - Modern Cyber-Glass Design */
+:root {
+  --accent: #00f2fe;
+  --accent-purple: #4facfe;
+  --bg-dark: rgba(10, 14, 23, 0.85);
+  --border-light: rgba(255, 255, 255, 0.12);
+  --text-primary: #ffffff;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #030712;
+  color: var(--text-primary);
+}
+
+/* 2D Control Panel overlay */
+#2d-gui-container {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 9999;
+  width: 360px;
+  padding: 24px;
+  background: var(--bg-dark);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-light);
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+h2 {
+  margin: 0 0 16px 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.section-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #6b7280;
+  margin: 14px 0 6px 0;
+}
+
+.input-group {
+  margin-bottom: 12px;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border-light);
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  box-sizing: border-box;
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+input[type="text"]:focus {
+  border-color: var(--accent);
+}
+
+input[type="file"] { display: none; }
+
+.btn {
+  display: inline-block;
+  width: 100%;
+  padding: 11px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  text-align: center;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.btn-file {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border: 1px solid var(--border-light);
+}
+
+.btn-file:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent));
+  color: #000;
+  margin-top: 6px;
+  font-weight: 700;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.preset-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.btn-sm {
+  padding: 8px;
+  font-size: 0.78rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-light);
+  color: #d1d5db;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-sm:hover {
+  background: rgba(0, 242, 254, 0.15);
+  color: var(--accent);
+}
